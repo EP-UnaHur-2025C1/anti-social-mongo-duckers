@@ -1,20 +1,31 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        minlength: 5
+  content: {
+    type: String,
+    required: [true,"El post debe tener contenido"],
+    minlength: [3,"El post debe tener al menos 3 caracteres"],
+    maxlength: [250,"El post puede tener un máximo de 250 caracteres"],
+  },
+  imagenes: {
+    type: [String],
+    validate: {
+      validator: function (arrayImagenes) {
+        return Array.isArray(arrayImagenes) && arrayImagenes.length <= 5;
+      },
+      message: () => `Un post no puede tener más de 5 imágenes`,
     },
-    content: {
-        type: String,
-        required: true
-    },
-    usuario: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    }
-}, { timestamps: true });
+    default: [],
+  },
+  usuario: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: [true,"El post debe tener un usuario"],
+  },
+  tags: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Tag"
+  }]
+});
 
-module.exports = mongoose.model('Post', postSchema);
+module.exports = mongoose.model("Post", postSchema);

@@ -1,25 +1,19 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    nickName: {
-        type: String,
-        required: [true, 'El nombre es obligatorio'],
-        minlength: [2, 'Nombre debe tener al menos 2 caracteres'],
-        unique: true
-    },
-    email: {
-        type: String,
-        required: true,
-        lowercase: true
-    },
-    posts: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post'
-    }],
-    comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment'
-    }]
-})
+  nickName: {
+    type: String,
+    required: [true, "El nickName es obligatorio"],
+    minlength: [3, "El nickName debe tener al menos 3 caracteres"],
+    maxlength : [30,"El nickName debe tener un máximo de 30 caracteres"],
+    unique: [true,"El nickName no puede repetirse"],
+  },
+  email: {
+    type: String,
+    required: [true,"El email es obligatorio"],
+    lowercase: [true,"El email debe estar en minúsculas"],
+    match: [/^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/, 'Ingresa una dirección de correo electrónico válida.']
+  }
+});
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model("User", userSchema);
