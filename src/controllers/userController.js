@@ -15,7 +15,7 @@ const crearUsuario = async (req, res) => {
 
 const mostrarUsuarios = async (_, res) => {
   try {
-    const usuarios = await User.find().select("nickName");
+    const usuarios = await User.find().select("nickName email");
     res.status(200).json(usuarios);
   } catch (error) {
     res.status(500).json({ message: "Error al mostrar usuarios", error });
