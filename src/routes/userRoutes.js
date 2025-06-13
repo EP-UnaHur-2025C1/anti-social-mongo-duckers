@@ -8,7 +8,7 @@ router.post('/', validarUser, userController.crearUsuario)
 router.put('/:id', validarUser, userController.actualizarUsuario)
 router.delete('/:id', userController.eliminarUsuario)
 
-router.post('/:id/users' ,userController.seguirUsuario)
-router.delete('/:id/users' ,userController.dejarDeSeguirUsuario)
+// router.post('/:id/users' ,userController.seguirUsuario)
+// router.delete('/:id/users' ,userController.dejarDeSeguirUsuario)
 
 module.exports = router;

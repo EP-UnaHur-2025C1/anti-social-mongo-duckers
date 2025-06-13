@@ -3,26 +3,26 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 const mongoose = require('mongoose');
 
-const crearUsuario = async (req, res) => {
+const crearUsuario = async (req, res) => { //FUNCIONA
   try {
     const nuevoUsuario = new User(req.body);
     await nuevoUsuario.save();
-    res.status(201).json(nuevoUsuario);
+    return res.status(201).json(nuevoUsuario);
   } catch (error) {
-    res.status(500).json({ message: "Error al crear usuario", error });
+    return res.status(500).json({ message: "Error al crear usuario", error });
   }
 };
 
-const mostrarUsuarios = async (_, res) => {
+const mostrarUsuarios = async (_, res) => { //FUNCIONA
   try {
     const usuarios = await User.find().select("nickName email");
-    res.status(200).json(usuarios);
+    return res.status(200).json(usuarios);
   } catch (error) {
-    res.status(500).json({ message: "Error al mostrar usuarios", error });
+    return res.status(500).json({ message: "Error al mostrar usuarios", error });
   }
 };
 
-const mostrarUsuario = async (req, res) => {
+const mostrarUsuario = async (req, res) => { //NO ANDA
   try {
     const id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -32,9 +32,9 @@ const mostrarUsuario = async (req, res) => {
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    res.status(200).json(usuario);
+    return res.status(200).json(usuario);
   } catch (error) {
-    res.status(500).json({ message: "Error al mostrar usuario", error });
+    return res.status(500).json({ message: "Error al mostrar usuario", error });
   }
 };
 
@@ -50,7 +50,7 @@ const actualizarUsuario = async (req,res) =>{
   }  
 }
 
-const eliminarUsuario = async (req, res) => {
+const eliminarUsuario = async (req, res) => { //FUNCIONA
   try {
     const id = req.params.id;
 
