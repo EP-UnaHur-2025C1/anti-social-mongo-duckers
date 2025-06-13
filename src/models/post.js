@@ -28,4 +28,10 @@ const postSchema = new mongoose.Schema({
   }]
 });
 
+postSchema.virtual('images', {
+    ref: 'PostImages',      // El modelo al que hace referencia
+    localField: '_id',      // Campo en el modelo Post
+    foreignField: 'postId'  // Campo en el modelo Post_Image que referencia al Post
+});
+
 module.exports = mongoose.model("Post", postSchema);

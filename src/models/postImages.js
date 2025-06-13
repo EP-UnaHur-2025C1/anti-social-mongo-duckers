@@ -7,7 +7,7 @@ const postImagesSchema = new mongoose.Schema({
     required: [true,"La url es obligatoria"]
     //validate: [validator.isUrl, "Url invalida"]
   },
-  post: {
+  postId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Post"
     }

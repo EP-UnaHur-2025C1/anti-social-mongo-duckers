@@ -2,14 +2,19 @@ const PostImages = require("../models/postImages");
 const Post = require("../models/post");
 const mongoose = require('mongoose')
 
-/*
+
 const crearImagen = async (url, postId) => {
-    const post = await Post.findByPk(postId)
+  try {
+    const post = await Post.findById(postId)
     if (!post) throw new Error('Post no encontrado')
-    const imagen = await Post_Images.create({ url, postId })
-    return imagen
+    const nuevaImagen = new PostImages({url,postId});
+    await nuevaImagen.save();
+    return nuevaImagen
+  } catch (error) {
+    return res.status(500).json({ message: "Error al crear imagen", error });
+  }
+    
 }
-*/
 
 const crearImagenPost = async (req, res) => {
   try {
@@ -70,7 +75,7 @@ const eliminarImagen = async (req, res) => {
 };
 
 module.exports = {
-//  crearImagen,
+  crearImagen,
   crearImagenPost,
   mostrarImagenes,
   actualizarImagen,
