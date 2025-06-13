@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { postImagesSchema } = require("../models/postImages")
 
 const postSchema = new mongoose.Schema({
   content: {
@@ -7,17 +8,7 @@ const postSchema = new mongoose.Schema({
     minlength: [3,"El post debe tener al menos 3 caracteres"],
     maxlength: [250,"El post puede tener un máximo de 250 caracteres"],
   },
-  imagenes: {
-    type: [String],
-    validate: {
-      validator: function (arrayImagenes) {
-        return Array.isArray(arrayImagenes) && arrayImagenes.length <= 5;
-      },
-      message: () => `Un post no puede tener más de 5 imágenes`,
-    },
-    default: [],
-  },
-  usuario: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: [true,"El post debe tener un usuario"],
@@ -26,7 +17,11 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref:"Tag"
   }]
-});
+  },
+  {
+    toJSON: { virtuals: true },  // Esto incluye virtuals cuando se convierte a JSON
+    toObject: { virtuals: true } // Esto incluye virtuals cuando se convierte a objeto
+  });
 
 postSchema.virtual('images', {
     ref: 'PostImages',      // El modelo al que hace referencia

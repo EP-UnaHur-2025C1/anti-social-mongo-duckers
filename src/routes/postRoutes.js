@@ -6,7 +6,7 @@ const validarPost = require('../middleware/validarPost')
 const postController = require('../controllers/postController')
 
 // Post
-//router.get('/', postController.mostrarPublicacion)
+router.get('/', postController.mostrarPublicaciones)
 router.post('/', validarPost,postController.crearPublicacion)
 //router.put('/:id', validarPost, postController.actualizarPublicacion)
 //router.delete('/:id', postController.eliminarPublicacion)

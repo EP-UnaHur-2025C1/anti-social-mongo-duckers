@@ -7,40 +7,43 @@ const mongoose = require('mongoose');
 const { crearImagen } = require('./postImagesController')
 
 const crearPublicacion = async (req, res) => {
-    try{
-        const { usuario, content, imagenes } = req.body
-        const user = await User.findById(usuario)
-        
-        if(!user){
-            return res.status(404).json({message:"Usuario inexistente"})
-        }
+  try {
+    const { userId, content, imagenes } = req.body;
+    const user = await User.findById(userId);
 
-        const nuevoPost = new Post(req.body);
-        await nuevoPost.save();
-
-        /* ver qué onda, supuestamente mongoose maneja el array solo
-        if (imagenes) {
-            for (const imagen of imagenes) {
-                await crearImagen(imagen.url, nuevoPost.id)
-            }
-        } */
-
-        if (imagenes && imagenes.length > 0) {
-            // Usamos Promise.all para crear imágenes concurrentemente y mejorar el rendimiento
-            const imagePromises = imagenes.map(imagen => crearImagen(imagen.url, nuevoPost._id));
-            await Promise.all(imagePromises);
-        }
-    
-        const publicacionConImagenes = await Post.findById(nuevoPost._id).populate("images")
-   
-        return res.status(200).json(publicacionConImagenes)
-    }catch(error){
-        console.error(error)
-        return res.status(500).json({ error: 'Error al crear publicación' })
+    if (!user) {
+      return res.status(404).json({ message: "Usuario inexistente" });
     }
-}
 
+    const nuevoPost = new Post({userId,content});
+    await nuevoPost.save();
+    
+    if(imagenes){
+      for(const imagen of imagenes){
+        await crearImagen(imagen.url, nuevoPost._id)
+      }
+    }
+
+    const postConImagenes = await Post.findById(nuevoPost._id).populate('images', 'url -_id -postId')
+
+    return res.status(201).json(postConImagenes);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error al crear publicación" });
+  }
+};
+
+const mostrarPublicaciones = async (_,res) => {
+  try {
+    const publicaciones = await Post.find().populate("images", "url -_id -postId");
+
+    return res.status(200).json(publicaciones);
+  } catch (error) {
+    return res.status(500).json({ message: "Error al mostrar publicaciones", error });
+  }
+}
 
 module.exports = {
     crearPublicacion,
+    mostrarPublicaciones
 }
