@@ -3,7 +3,7 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 const mongoose = require('mongoose');
 
-const crearUsuario = async (req, res) => { //FUNCIONA
+const crearUsuario = async (req, res) => {
   try {
     const nuevoUsuario = new User(req.body);
     await nuevoUsuario.save();
@@ -13,7 +13,7 @@ const crearUsuario = async (req, res) => { //FUNCIONA
   }
 };
 
-const mostrarUsuarios = async (_, res) => { //FUNCIONA
+const mostrarUsuarios = async (_, res) => {
   try {
     const usuarios = await User.find().select("nickName email");
     return res.status(200).json(usuarios);
@@ -22,7 +22,7 @@ const mostrarUsuarios = async (_, res) => { //FUNCIONA
   }
 };
 
-const mostrarUsuario = async (req, res) => { //NO ANDA
+const mostrarUsuario = async (req, res) => {
   try {
     const id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -50,7 +50,7 @@ const actualizarUsuario = async (req,res) =>{
   }  
 }
 
-const eliminarUsuario = async (req, res) => { //FUNCIONA
+const eliminarUsuario = async (req, res) => {
   try {
     const id = req.params.id;
 
