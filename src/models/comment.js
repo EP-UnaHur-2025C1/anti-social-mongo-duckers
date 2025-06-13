@@ -7,12 +7,12 @@ const commentSchema = new mongoose.Schema({
     minlength: [4,"El contenido del comentario debe tener al menos 4 caracteres"],
     maxlength: [250,"El contenido del comentario puede tenre un máximo de 250 caracteres"],
   },
-  usuario: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: [true,"El comentario debe tener un usuario"],
   },
-  post: {
+  postId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
     required: [true,"El comentario debe tener un post"],

@@ -7,9 +7,10 @@ const postController = require('../controllers/postController')
 
 // Post
 router.get('/', postController.mostrarPublicaciones)
-router.post('/', validarPost,postController.crearPublicacion)
-//router.put('/:id', validarPost, postController.actualizarPublicacion)
-//router.delete('/:id', postController.eliminarPublicacion)
+router.get('/:id', postController.mostrarPublicacion)
+router.post('/', validarPost, postController.crearPublicacion)
+router.put('/:id', validarPost, postController.actualizarPublicacion)
+router.delete('/:id', postController.eliminarPublicacion)
 
 // // Images
 // router.put('/:id/images/:imageId', validarActualizarImagen ,postController.actualizarImagen)
