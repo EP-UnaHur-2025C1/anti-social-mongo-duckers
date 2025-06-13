@@ -44,9 +44,9 @@ const actualizarUsuario = async (req,res) =>{
     if (!usuarioActualizado) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    res.status(200).json({ message: 'Usuario actualizado', user: usuarioActualizado });
+    return res.status(200).json({ message: 'Usuario actualizado', user: usuarioActualizado });
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el usuario', error });
+    return res.status(500).json({ message: 'Error al actualizar el usuario', error });
   }  
 }
 
@@ -63,9 +63,9 @@ const eliminarUsuario = async (req, res) => {
     await Comment.deleteMany({ usuario: usuarioAEliminar._id });
     await User.findByIdAndDelete(id);
 
-    res.status(200).json({message: "Usuario eliminado exitosamente"});
+    return res.status(200).json({message: "Usuario eliminado exitosamente"});
   } catch (error) {
-    res.status(500).json({ message:"Error al eliminar usuario", error});
+    return res.status(500).json({ message:"Error al eliminar usuario", error});
   }
 };
 

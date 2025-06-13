@@ -5,18 +5,18 @@ const crearComentario = async (req, res) => {
   try {
     const nuevoComentario = new Comment(req.body);
     await nuevoComentario.save();
-    res.status(201).json(nuevoComentario);
+    return res.status(201).json(nuevoComentario);
   } catch (error) {
-    res.status(500).json({ message: "Error al crear comentario", error });
+    return res.status(500).json({ message: "Error al crear comentario", error });
   }
 };
 
 const mostrarComentarios = async (_, res) => {
   try {
     const comentarios = await Comment.find().select("comment");
-    res.status(200).json(comentarios);
+    return res.status(200).json(comentarios);
   } catch (error) {
-    res.status(500).json({ message: "Error al mostrar comentarios", error });
+    return res.status(500).json({ message: "Error al mostrar comentarios", error });
   }
 };
 
@@ -30,9 +30,9 @@ const mostrarComentario = async (req, res) => {
     if (!comentario) {
       return res.status(404).json({ message: "Comentario no encontrado" });
     }
-    res.status(200).json(comentario);
+    return res.status(200).json(comentario);
   } catch (error) {
-    res.status(500).json({ message: "Error al mostrar comentario", error });
+    return res.status(500).json({ message: "Error al mostrar comentario", error });
   }
 };
 
@@ -42,9 +42,9 @@ const actualizarComentario = async (req,res) =>{
     if (!comentarioActualizado) {
       return res.status(404).json({ message: 'Comentario no encontrado' });
     }
-    res.status(200).json({ message: 'Comentario actualizado', comment: comentarioActualizado });
+    return res.status(200).json({ message: 'Comentario actualizado', comment: comentarioActualizado });
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el comentario', error });
+    return res.status(500).json({ message: 'Error al actualizar el comentario', error });
   }  
 }
 
@@ -59,9 +59,9 @@ const eliminarComentario = async (req, res) => {
 
     await Comment.findByIdAndDelete(id);
 
-    res.status(200).json({message: "Comentario eliminado exitosamente"});
+    return res.status(200).json({message: "Comentario eliminado exitosamente"});
   } catch (error) {
-    res.status(500).json({ message:"Error al eliminar comentario", error});
+    return res.status(500).json({ message:"Error al eliminar comentario", error});
   }
 };
 

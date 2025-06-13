@@ -26,18 +26,18 @@ const crearImagenPost = async (req, res) => {
 
     const nuevaImagen = new PostImages(req.body);
     await nuevaImagen.save();
-    res.status(201).json(nuevaImagen);
+    return res.status(201).json(nuevaImagen);
   } catch (error) {
-    res.status(500).json({ message: "Error al crear imagen", error });
+    return res.status(500).json({ message: "Error al crear imagen", error });
   }
 };
 
 const mostrarImagenes = async (_, res) => {
   try {
     const imagenes = await PostImages.find().select("url post");
-    res.status(200).json(imagenes);
+    return res.status(200).json(imagenes);
   } catch (error) {
-    res.status(500).json({ message: "Error al mostrar imagenes", error });
+    return res.status(500).json({ message: "Error al mostrar imagenes", error });
   }
 };
 
@@ -47,9 +47,9 @@ const actualizarImagen = async (req, res) => {
     if (!imagenActualizada) {
       return res.status(404).json({ message: 'Imagen no encontrada' });
     }
-    res.status(200).json({ message: 'Imagen actualizada', PostImages: imagenActualizada });
+    return res.status(200).json({ message: 'Imagen actualizada', PostImages: imagenActualizada });
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar la imagen', error });
+    return res.status(500).json({ message: 'Error al actualizar la imagen', error });
   }  
 };
 
@@ -63,9 +63,9 @@ const eliminarImagen = async (req, res) => {
 
     await PostImages.findByIdAndDelete(id);
 
-    res.status(200).json({message: "Imagen eliminada exitosamente"});
+    return res.status(200).json({message: "Imagen eliminada exitosamente"});
   } catch (error) {
-    res.status(500).json({ message:"Error al eliminar imagen", error});
+    return res.status(500).json({ message:"Error al eliminar imagen", error});
   }
 };
 
