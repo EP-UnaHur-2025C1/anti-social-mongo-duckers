@@ -56,13 +56,23 @@ const mostrarPublicacion = async (req, res) => {
 
 const actualizarPublicacion = async (req,res) =>{
   try {
+    const { userId, content, imagenes } = req.body;
     const postActualizado = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!postActualizado) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+      return res.status(404).json({ message: 'Publicación no encontrada' });
     }
-    return res.status(200).json({ message: 'Usuario actualizado', post: postActualizado });
+
+    if(imagenes){
+      for(const imagen of imagenes){
+        await crearImagen(imagen.url, nuevoPost._id)
+      }
+    }
+
+    const postConImagenes = await Post.findById(nuevoPost._id).populate('images', 'url -_id -postId')
+
+    return res.status(200).json({ message: 'Publicación actualizada', post: postActualizado });
   } catch (error) {
-    return res.status(500).json({ message: 'Error al actualizar el post', error });
+    return res.status(500).json({ message: 'Error al actualizar la publicación', error });
   }  
 }
 
@@ -77,7 +87,7 @@ const eliminarPublicacion = async (req, res) => {
 
     await PostImages.deleteMany({ postId: publicacionAEliminar._id });
     await Comment.deleteMany({ postId: publicacionAEliminar._id });
-    await Post.findByIdAndDelete(postId);
+    await publicacionAEliminar.deleteOne();
 
     return res.status(200).json({message: "Publicación eliminada exitosamente"});
   } catch (error) {
@@ -85,10 +95,57 @@ const eliminarPublicacion = async (req, res) => {
   }
 };
 
+const eliminarImagen = async (req,res)=>{
+    try {
+        const {postId, imageId} = req.params
+        const publicacion = await Post.findById(postId)
+
+        if(!publicacion){
+            return res.status(404).json({message: "Publicacion no encontrada"})
+        }
+
+        const imagen = await PostImages.findOneAndDelete({_id: imageId, postId: postId})
+
+        if(!imagen){
+            return res.status(404).json({message: "Imagen no encontrada"})
+        }
+
+        res.status(200).json({message: "Imagen eliminada"})
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ error: 'Error al eliminar imagen' })
+    }
+}
+
+const actualizarImagen = async (req,res)=>{
+    try {
+        const { postId, imageId } = req.params
+        const publicacion = await Post.findById(postId)
+        
+        if(!publicacion){
+            return res.status(404).json({message: `Publicacion no encontrada`})
+        }
+        
+        const imagen = await PostImages.findOneAndUpdate({_id: imageId, postId: postId}, req.body, { new: true })
+        
+        if(!imagen){
+            return res.status(404).json({message: "Imagen no encontrada"})
+        }
+
+        res.status(200).json(imagen)
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ error: 'Error al actualizar imagen' })
+    }
+}
+
+
 module.exports = {
     crearPublicacion,
     mostrarPublicaciones,
     mostrarPublicacion,
     actualizarPublicacion,
-    eliminarPublicacion
+    eliminarPublicacion,
+    eliminarImagen,
+    actualizarImagen
 }
