@@ -68,11 +68,11 @@ const actualizarPublicacion = async (req,res) =>{
 
     if(imagenes){
       for(const imagen of imagenes){
-        await crearImagen(imagen.url, nuevoPost._id)
+        await crearImagen(imagen.url, postActualizado._id)
       }
     }
 
-    const postConImagenes = await Post.findById(nuevoPost._id).populate('images', 'url -_id -postId')
+    const postConImagenes = await Post.findById(postActualizado._id).populate('images', 'url -_id -postId')
 
     return res.status(200).json({ message: 'Publicación actualizada', post: postConImagenes });
   } catch (error) {
