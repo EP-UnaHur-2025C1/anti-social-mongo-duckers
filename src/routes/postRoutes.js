@@ -17,8 +17,8 @@ router.put('/:postId/images/:imageId', /*validarActualizarImagen, */ postControl
 router.delete('/:postId/images/:imageId', postController.eliminarImagen)
 
 // // Tags
-// router.post('/:id/tags', postController.asociarTagAPost)
-// router.delete('/:id/tags', postController.desasociarTagDePost)
-// router.get('/:id/tags', postController.obtenerTagsDeUnPost)
+router.post('/:postId/tags/:tagId', postController.asociarTagAPost);
+router.delete('/:postId/tags/:tagId', postController.desasociarTagDePost);
+router.get('/:postId/tags', postController.obtenerTagsDeUnPost)
 
 module.exports = router

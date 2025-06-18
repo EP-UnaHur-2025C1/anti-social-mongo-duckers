@@ -13,7 +13,7 @@ const crearTag = async (req, res) => {
 
 const mostrarTags = async (_, res) => {
   try {
-    const tags = await Tag.find().select("tag");
+    const tags = await Tag.find().select("tag").populate('posts');
     return res.status(200).json(tags);
   } catch (error) {
     return res.status(500).json({ message: "Error al mostrar tags", error });

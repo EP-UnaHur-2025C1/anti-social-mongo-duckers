@@ -56,7 +56,7 @@ const mostrarPublicacion = async (req, res) => {
 
 const actualizarPublicacion = async (req,res) =>{
   try {
-    const { userId, content, imagenes } = req.body;
+    const { imagenes } = req.body;
     const postActualizado = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!postActualizado) {
       return res.status(404).json({ message: 'Publicación no encontrada' });
@@ -70,7 +70,7 @@ const actualizarPublicacion = async (req,res) =>{
 
     const postConImagenes = await Post.findById(nuevoPost._id).populate('images', 'url -_id -postId')
 
-    return res.status(200).json({ message: 'Publicación actualizada', post: postActualizado });
+    return res.status(200).json({ message: 'Publicación actualizada', post: postConImagenes });
   } catch (error) {
     return res.status(500).json({ message: 'Error al actualizar la publicación', error });
   }  
@@ -139,6 +139,80 @@ const actualizarImagen = async (req,res)=>{
     }
 }
 
+const asociarTagAPost = async (req,res) =>{
+  try {
+    const { postId, tagId } = req.params
+    const publicacion = await Post.findById(postId);
+    const etiqueta = await Tag.findById(tagId);
+
+    if(!publicacion){
+      return res.status(404).json({message: `Publicacion no encontrada`})
+    }
+    if(!etiqueta){
+      return res.status(404).json({message: `Tag no encontrado`})
+    }
+    
+    if (!publicacion.tags.includes(tagId)) {
+      publicacion.tags.push(tagId);
+      etiqueta.posts.push(postId);
+      await publicacion.save();
+      await etiqueta.save();
+      return res.status(200).json({message: `El Tag ${etiqueta.tag} asociado a la publicación`})
+    } else {
+      return res.status(200).json({message: `El Tag ${etiqueta.tag} ya se encontraba asociado a la publicación`})
+    }
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error al asociar tag al post' })
+  }
+}
+
+const desasociarTagDePost = async (req, res) => {
+  try {
+    const { postId, tagId } = req.params;
+
+    const publicacion = await Post.findById(postId);
+    const etiqueta = await Tag.findById(tagId);
+
+    if (!publicacion) {
+      return res.status(404).json({ message: `Publicación no encontrada` });
+    }
+    if (!etiqueta) {
+      return res.status(404).json({ message: `Tag no encontrado` });
+    }
+
+    if (publicacion.tags.includes(tagId)) {
+      publicacion.tags.pull(tagId);
+      etiqueta.posts.pull(postId);
+
+      await publicacion.save();
+      await etiqueta.save();
+
+      return res.status(200).json({ message: `El Tag ${etiqueta.tag} ha sido desasociado de la publicación` });
+    } else {
+      return res.status(200).json({ message: `El Tag ${etiqueta.tag} no estaba asociado a la publicación` });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Error al desasociar tag del post' });
+  }
+};
+
+const obtenerTagsDeUnPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const publicacion = await Post.findById(postId).populate('tags');
+
+    if (!publicacion) {
+      return res.status(404).json({ message: `Publicación no encontrada` });
+    }
+
+    return res.status(200).json(publicacion.tags);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Error al obtener los tags de la publicación' });
+  }
+};
 
 module.exports = {
     crearPublicacion,
@@ -147,5 +221,8 @@ module.exports = {
     actualizarPublicacion,
     eliminarPublicacion,
     eliminarImagen,
-    actualizarImagen
+    actualizarImagen,
+    asociarTagAPost,
+    desasociarTagDePost,
+    obtenerTagsDeUnPost
 }
