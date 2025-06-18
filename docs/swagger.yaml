@@ -1,0 +1,1052 @@
+openapi: 3.0.0
+info:
+  title: Duckers Anti-Social API
+  description: API para la red social Duckers Anti-Social. Permite crear usuarios, realizar publicaciones, comentar, subir imágenes y etiquetar contenidos.
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:3000/
+
+paths:
+  /users:
+    get:
+      summary: Obtener todos los usuarios
+      tags: [Users]
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Crear un usuario nuevo
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nickName, email]
+              properties:
+                nickName:
+                  type: string
+                  description: Nombre de usuario único
+                  minLength: 3
+                  maxLength: 30
+                  example: "codeMiau99"
+                  x-unique: true
+                email:
+                  type: string
+                  format: email
+                  pattern: '^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$'
+                  description: Dirección de correo electrónico única
+                  example: "codemiau99@unahur.edu.ar"
+                  x-unique: true
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '409': 
+          description: El nickName o email ya está en uso.
+        '422': 
+          description: Error de validación en los datos del usuario.
+        '500':
+          description: Error al crear Usuario
+
+  /users/{id}:
+    get:
+      summary: Obtener un usuario por ID
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: No existe usuario con esa ID
+        '500':
+          description: Error al obtener usuario
+
+    put:
+      summary: Actualizar un usuario por ID
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickName:
+                  type: string
+                  description: Nombre de usuario único
+                  minLength: 3
+                  maxLength: 30
+                  example: "nuevoCodeMiau"
+                email:
+                  type: string
+                  format: email
+                  pattern: '^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$'
+                  description: Dirección de correo electrónico única
+                  example: "nuevo@unahur.edu.ar"
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: No existe usuario con esa ID
+        '422':
+          description: Error de validación en los datos del usuario.
+        '500':
+          description: Error al actualizar usuario
+
+    delete:
+      summary: Eliminar un usuario por ID
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '204':
+          description: Usuario eliminado exitosamente
+        '404':
+          description: No existe usuario con esa ID
+        '500':
+          description: Error al eliminar usuario
+
+  /users/{followerId}/follow/{targetUserId}:
+    post:
+      summary: Seguir a un usuario
+      tags: [Users]
+      parameters:
+        - in: path
+          name: followerId
+          description: ID del usuario que inicia el seguimiento (el que "sigue")
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        - in: path
+          name: targetUserId
+          description: ID del usuario a quien se desea seguir
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Has seguido correctamente a este usuario
+        '400':
+          description: |
+            - No puedes seguirte a ti mismo
+            - Ya sigues a este usuario
+        '404':
+          description: Usuario/s no encontrado/s
+        '500':
+          description: Error al seguir al usuario
+
+  /users/{followerId}/unfollow/{targetUserId}:
+    delete:
+      summary: Dejar de seguir a un usuario
+      tags: [Users]
+      parameters:
+        - in: path
+          name: followerId
+          description: ID del usuario que deja de seguir
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        - in: path
+          name: targetUserId
+          description: ID del usuario a quien se desea dejar de seguir
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Has dejado de seguir a este usuario
+        '400':
+          description: No sigues a este usuario
+        '404':
+          description: Usuario/s no encontrado/s
+        '500':
+          description: Error al dejar de seguir a usuario
+
+  /users/{id}/following:
+    get:
+      summary: Obtener los usuarios que un usuario sigue
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          description: ID del usuario del que se quiere obtener los seguidos
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Lista de usuarios seguidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User' 
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error al obtener los seguidos
+
+  /posts:
+    get:
+      summary: Obtener todas las publicaciones
+      tags: [Posts]
+      responses:
+        '200':
+          description: Lista de publicaciones visibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Crear una publicación nueva (con imágenes opcionales)
+      tags: [Posts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, content]
+              properties:
+                userId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  description: ID del usuario que crea el post
+                  example: "" # Vacío para entrada manual
+                content:
+                  type: string
+                  description: Contenido del post
+                  minLength: 3
+                  maxLength: 250
+                  example: "Esto es una publicación nueva"
+                imagenes: 
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: object
+                    required:
+                      - url
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+                        example: "https://picsum.photos/id/120/200/300"
+      responses:
+        '201':
+          description: Publicación creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Usuario inexistente
+        '422':
+          description: Error de validación en los datos del post.
+        '500':
+          description: Error al crear publicación
+
+  /posts/{id}:
+    get:
+      summary: Obtener una publicación por ID
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Publicación encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Publicación no encontrada
+        '500':
+          description: Error al obtener publicación
+
+    put:
+      summary: Actualizar una publicación por ID
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Contenido del post
+                  minLength: 3
+                  maxLength: 250
+                  example: "Actualizacion de contenido"
+                imagenes:
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: object
+                    required:
+                      - url
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+                        example: "https://picsum.photos/id/121/200/300"
+                userId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  example: "" # Vacío para entrada manual
+
+      responses:
+        '200':
+          description: Publicación actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: No existe publicación o usuario con esa ID
+        '422':
+          description: Error de validación en los datos del post.
+        '500':
+          description: Error al actualizar publicación
+
+    delete:
+      summary: Eliminar una publicación por ID
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '204':
+          description: Publicación eliminada exitosamente
+        '404':
+          description: Publicación no encontrada
+        '500':
+          description: Error al eliminar publicación
+
+  /posts/{postId}/images/{imageId}:
+    put:
+      summary: Actualizar imagen de una publicación por ID
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          description: ID de la publicación
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        - in: path
+          name: imageId
+          description: ID de la imagen dentro de la publicación
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  example: "https://imagesupdate.jpg"
+      responses:
+        '200':
+          description: Imagen actualizada exitosamente
+        '404':
+          description: No existe publicación o imagen
+        '422':
+          description: Error de validación en los datos de la imagen.
+        '500':
+          description: Error al actualizar imagen
+
+    delete:
+      summary: Eliminar imagen de una publicación por ID
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          description: ID de la publicación
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        - in: path
+          name: imageId
+          description: ID de la imagen dentro de la publicación
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '204':
+          description: Imagen eliminada exitosamente
+        '404':
+          description: Publicación o imagen no encontrada
+        '500':
+          description: Error al eliminar imagen
+
+  /posts/{postId}/tags/{tagId}:
+    post:
+      summary: Asociar tag a una publicación
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          description: ID de la publicación
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        - in: path
+          name: tagId
+          description: ID del tag a asociar
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Tag asociado correctamente al Post
+        '404':
+          description: Post o Tag no encontrado
+        '500':
+          description: Error al asociar el tag al post
+
+    delete:
+      summary: Desasociar tag de una publicación
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          description: ID de la publicación
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        - in: path
+          name: tagId
+          description: ID del tag a desasociar
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Tag eliminado correctamente del Post
+        '404':
+          description: Post o Tag no encontrado
+        '500':
+          description: Error al eliminar el tag del post
+
+  /comments:
+    get:
+      summary: Obtener todos los comentarios
+      tags: [Comments]
+      responses:
+        '200':
+          description: Comentarios visibles (según filtro por antigüedad)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      summary: Crear un comentario
+      tags: [Comments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [postId, userId, comment]
+              properties:
+                postId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  description: ID del post al que se comenta
+                  example: "" # Vacío para entrada manual
+                userId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  description: ID del usuario que comenta
+                  example: "" # Vacío para entrada manual
+                comment:
+                  type: string
+                  description: Contenido del comentario
+                  minLength: 4
+                  maxLength: 250
+                  example: "¡Excelente contenido!"
+      responses:
+        '201':
+          description: Comentario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          description: Post o Usuario inexistentes
+        '422':
+          description: Error de validación en los datos del comentario.
+        '500':
+          description: Error al crear comentario
+
+  /comments/{id}:
+    put:
+      summary: Actualizar un comentario por ID
+      tags: [Comments]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: string
+                  description: Contenido del comentario
+                  minLength: 4
+                  maxLength: 250
+                  example: "¡Comentario actualizado!"
+                userId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  example: "" # Vacío para entrada manual
+                postId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  example: "" # Vacío para entrada manual
+      responses:
+        '200':
+          description: Comentario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          description: No existe comentario con esa ID
+        '422':
+          description: Error de validación en los datos del comentario.
+        '500':
+          description: Error al actualizar comentario
+
+    delete:
+      summary: Eliminar un comentario por ID
+      tags: [Comments]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '204':
+          description: Comentario eliminado
+        '404':
+          description: No existe comentario con esa ID
+        '500':
+          description: Error al eliminar comentario
+
+  /images:
+    get:
+      summary: Obtener todas las imágenes
+      tags: [PostImages]
+      responses:
+        '200':
+          description: Lista de imágenes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostImage'
+
+    post:
+      summary: Crear una imagen para un post
+      tags: [PostImages]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [postId, url]
+              properties:
+                postId:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  description: ID del post al que se asocia la imagen
+                  example: "" # Vacío para entrada manual
+                url:
+                  type: string
+                  format: uri
+                  description: URL de la imagen
+                  example: "https://assets/nueva-imagen.png"
+      responses:
+        '201':
+          description: Imagen creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostImage'
+        '400':
+          description: El post ya tiene el máximo de 5 imágenes
+        '404':
+          description: Post inexistente
+        '422':
+          description: Error de validación en los datos de la imagen.
+        '500':
+          description: Error al crear Imagen
+
+  /images/{id}:
+    put:
+      summary: Actualizar una imagen por ID
+      tags: [PostImages]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  example: "https://imagenactualizada.jpg"
+
+      responses:
+        '200':
+          description: Imagen actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostImage'
+        '404':
+          description: No existe imagen con ID
+        '422':
+          description: Error de validación en los datos de la imagen.
+        '500':
+          description: Error al actualizar Imagen
+
+    delete:
+      summary: Eliminar una imagen por ID
+      tags: [PostImages]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '204':
+          description: Imagen eliminada exitosamente
+        '404':
+          description: No existe imagen con ID
+        '500':
+          description: Error al eliminar Imagen
+
+
+  /tags:
+    get:
+      summary: Obtener todos los tags
+      tags: [Tags]
+      responses:
+        '200':
+          description: Tags existentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+
+    post:
+      summary: Crear un tag
+      tags: [Tags]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tag]
+              properties:
+                tag:
+                  type: string
+                  description: Nombre del tag
+                  minLength: 3
+                  maxLength: 20
+                  example: "Tecnología"
+      responses:
+        '201':
+          description: Tag creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '422':
+          description: Error de validación en los datos del tag.
+        '500':
+          description: Error al crear Tag
+
+  /tags/{id}:
+    put:
+      summary: Actualizar un tag por ID
+      tags: [Tags]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tag]
+              properties:
+                tag:
+                  type: string
+                  description: Nombre del tag
+                  minLength: 3
+                  maxLength: 20
+                  example: "Programación"
+      responses:
+        '200':
+          description: Tag actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '404':
+          description: No existe etiqueta con esa ID
+        '422':
+          description: Error de validación en los datos del tag.
+        '500':
+          description: Error al actualizar Tag
+
+    delete:
+      summary: Eliminar un tag por ID
+      tags: [Tags]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+      responses:
+        '204':
+          description: Tag eliminado exitosamente
+        '404':
+          description: No existe etiqueta con esa ID
+        '500':
+          description: Error al eliminar Tag
+
+components:
+  schemas:
+    # Modelos completos con _id (para respuestas GET/PUT)
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID autogenerada por MongoDB
+          example: "" # Vacío para entrada manual
+        nickName:
+          type: string
+          description: Nombre de usuario único
+          minLength: 3
+          maxLength: 30
+          example: "codeMiau99"
+          x-unique: true # Propiedad personalizada para indicar unicidad
+        email:
+          type: string
+          format: email
+          pattern: '^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$' # Regex de tu schema
+          description: Dirección de correo electrónico única
+          example: "codemiau99@unahur.edu.ar"
+          x-unique: true # Propiedad personalizada para indicar unicidad
+        seguidos:
+          type: array
+          description: Lista de IDs de usuarios a quienes este usuario sigue
+          items:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-05-10T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-05-16T12:45:00Z"
+      required:
+        - _id
+        - nickName
+        - email
+
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID autogenerada por MongoDB
+          example: "" # Vacío para entrada manual
+        userId:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID del usuario que creó el post (referencia a User)
+          example: "" # Vacío para entrada manual
+        content:
+          type: string
+          description: Contenido del post
+          minLength: 3
+          maxLength: 250
+          example: "Python > Java."
+        tags:
+          type: array
+          description: IDs de los tags asociados a este post
+          items:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        imagenes: # Este es el virtual, que contendrá objetos PostImage
+          type: array
+          description: Imágenes asociadas a este post (campo virtual)
+          items:
+            $ref: '#/components/schemas/PostImage'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-05-10T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-05-16T12:45:00Z"
+      required:
+        - _id
+        - userId
+        - content
+
+    PostImage:
+      type: object
+      properties:
+        _id:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID autogenerada por MongoDB
+          example: "" # Vacío para entrada manual
+        url:
+          type: string
+          format: uri
+          description: URL de la imagen
+          example: "https://assets/lenguajes.png"
+        postId:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID del post al que pertenece la imagen (referencia a Post)
+          example: "" # Vacío para entrada manual
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-05-10T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-05-16T12:45:00Z"
+      required:
+        - _id
+        - url
+        - postId
+
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID autogenerada por MongoDB
+          example: "" # Vacío para entrada manual
+        comment:
+          type: string
+          description: Contenido del comentario
+          minLength: 4
+          maxLength: 250
+          example: "Muy buena publicacion !!!"
+        userId:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID del usuario que creó el comentario (referencia a User)
+          example: "" # Vacío para entrada manual
+        postId:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID del post al que pertenece el comentario (referencia a Post)
+          example: "" # Vacío para entrada manual
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-05-10T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-05-16T12:45:00Z"
+      required:
+        - _id
+        - comment
+        - userId
+        - postId
+
+    Tag:
+      type: object
+      properties:
+        _id:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: ID autogenerada por MongoDB
+          example: "" # Vacío para entrada manual
+        tag:
+          type: string
+          description: Nombre del tag
+          minLength: 3
+          maxLength: 20
+          example: "Informática"
+        posts:
+          type: array
+          description: IDs de los posts asociados a este tag
+          items:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: "" # Vacío para entrada manual
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-05-10T09:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-05-16T12:45:00Z"
+      required:
+        - _id
+        - tag
