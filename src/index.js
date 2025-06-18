@@ -15,7 +15,7 @@ app.use(express.json())
 app.use('/users', require('./routes/userRoutes'));
  app.use('/posts', require('./routes/postRoutes'));
 // app.use('/archives', require('./routes/postImagesRoutes'));
-// app.use('/comments', require('./routes/commentRoutes'));
+app.use('/comments', require('./routes/commentRoutes'));
 // app.use('/tags', require('./routes/tagRoutes'));
 
 // Conexión a MongoDB

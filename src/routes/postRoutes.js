@@ -13,8 +13,8 @@ router.put('/:id', validarPost, postController.actualizarPublicacion)
 router.delete('/:id', postController.eliminarPublicacion)
 
 // // Images
-// router.put('/:id/images/:imageId', validarActualizarImagen ,postController.actualizarImagen)
-// router.delete('/:id/images/:imageId', postController.eliminarImagen)
+router.put('/:postId/images/:imageId', /*validarActualizarImagen, */ postController.actualizarImagen)
+router.delete('/:postId/images/:imageId', postController.eliminarImagen)
 
 // // Tags
 // router.post('/:id/tags', postController.asociarTagAPost)
