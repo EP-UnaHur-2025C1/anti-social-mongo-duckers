@@ -35,7 +35,7 @@ const crearPublicacion = async (req, res) => {
 
 const mostrarPublicaciones = async (_,res) => {
   try {
-    const publicaciones = await Post.find().populate("images", "url -_id -postId");
+    const publicaciones = await Post.find().populate("images", "url -postId");
 
     return res.status(200).json(publicaciones);
   } catch (error) {
@@ -46,7 +46,7 @@ const mostrarPublicaciones = async (_,res) => {
 const mostrarPublicacion = async (req, res) => {
   try {
     const postId = req.params.id;
-    const publicacion = await Post.findById(postId).populate("images", "url -_id -postId");
+    const publicacion = await Post.findById(postId).populate("images", "url -postId");
 
     if (!publicacion) {
       return res.status(404).json({ message: "Publicación inexistente" });

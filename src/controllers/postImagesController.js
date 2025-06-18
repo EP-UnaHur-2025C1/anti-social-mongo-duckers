@@ -77,5 +77,5 @@ module.exports = {
   crearImagenPost,
   mostrarImagenes,
   actualizarImagenPost,
-  eliminarImagenPost,
+  eliminarImagenPost
 };
