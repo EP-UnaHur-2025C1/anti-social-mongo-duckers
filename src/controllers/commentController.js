@@ -50,14 +50,12 @@ const actualizarComentario = async (req,res) =>{
 
 const eliminarComentario = async (req, res) => {
   try {
-    const id = req.params.id;
+    const commentId = req.params.id;
 
-    const comentarioAEliminar = await Comment.findById(id);
+    const comentarioAEliminar = await Comment.findByIdAndDelete(commentId);
     if (!comentarioAEliminar) {
-      return res.status(404).json({ message: `No existe el comentario con ID: ${id}` });
+      return res.status(404).json({ message: `No existe el comentario con ID: ${commentId}` });
     }
-
-    await Comment.findByIdAndDelete(id);
 
     return res.status(200).json({message: "Comentario eliminado exitosamente"});
   } catch (error) {

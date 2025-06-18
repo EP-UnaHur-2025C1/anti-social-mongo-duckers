@@ -42,11 +42,11 @@ const actualizarUsuario = async (req,res) =>{
   try {
     const usuarioActualizado = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!usuarioActualizado) {
-      return res.status(404).json({ message: 'Publicación no encontrada' });
+      return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    return res.status(200).json({ message: 'Publicación actualizada', user: usuarioActualizado });
+    return res.status(200).json({ message: 'Usuario actualizado', user: usuarioActualizado });
   } catch (error) {
-    return res.status(500).json({ message: 'Error al actualizar la Publicación', error });
+    return res.status(500).json({ message: 'Error al actualizar el usuario', error });
   }  
 }
 
@@ -61,7 +61,7 @@ const eliminarUsuario = async (req, res) => {
 
     await Post.deleteMany({ userId: usuarioAEliminar._id });
     await Comment.deleteMany({ userId: usuarioAEliminar._id });
-    await User.findByIdAndDelete(id);
+    await usuarioAEliminar.deleteOne();
 
     return res.status(200).json({message: "Usuario eliminado exitosamente"});
   } catch (error) {

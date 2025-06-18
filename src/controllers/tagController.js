@@ -50,13 +50,11 @@ const actualizarTag = async (req,res) =>{
 
 const eliminarTag = async (req, res) => {
   try {
-    const id = req.params.id;
-    const tagAEliminar = await Tag.findById(id);
+    const tagId = req.params.id;
+    const tagAEliminar = await Tag.findByIdAndDelete(tagId);
     if (!tagAEliminar) {
-      return res.status(404).json({ message: `No existe el tag con ID: ${id}` });
+      return res.status(404).json({ message: `No existe el tag con ID: ${tagId}` });
     }
-
-    await Tag.findByIdAndDelete(id);
 
     return res.status(200).json({message: "Tag eliminado exitosamente"});
   } catch (error) {

@@ -46,7 +46,7 @@ const mostrarImagenes = async (_, res) => {
   }
 };
 
-const actualizarImagen = async (req, res) => {
+const actualizarImagenPost = async (req, res) => {
   try {
     const imagenActualizada = await PostImages.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!imagenActualizada) {
@@ -58,15 +58,13 @@ const actualizarImagen = async (req, res) => {
   }  
 };
 
-const eliminarImagen = async (req, res) => {
+const eliminarImagenPost = async (req, res) => {
   try {
-    const id = req.params.id;
-    const imagenAEliminar = await PostImages.findById(id);
+    const imagenId = req.params.id;
+    const imagenAEliminar = await PostImages.findByIdAndDelete(imagenId);
     if (!imagenAEliminar) {
-      return res.status(404).json({ message: `No existe la imagen con ID: ${id}` });
+      return res.status(404).json({ message: `No existe la imagen con ID: ${imagenId}` });
     }
-
-    await PostImages.findByIdAndDelete(id);
 
     return res.status(200).json({message: "Imagen eliminada exitosamente"});
   } catch (error) {
@@ -78,6 +76,6 @@ module.exports = {
   crearImagen,
   crearImagenPost,
   mostrarImagenes,
-  actualizarImagen,
-  eliminarImagen,
+  actualizarImagenPost,
+  eliminarImagenPost,
 };
