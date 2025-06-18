@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/', postImagesController.mostrarImagenes);
 router.post('/',validarPostImages, postImagesController.crearImagenPost);
-router.put('/:id',validarPostImages, postImagesController.actualizarImagen);
-router.delete('/:id', postImagesController.eliminarImagen);
+router.put('/:id',validarPostImages, postImagesController.actualizarImagenPost);
+router.delete('/:id', postImagesController.eliminarImagenPost);
 
 module.exports = router;

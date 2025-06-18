@@ -10,7 +10,7 @@ router.put('/:id', validarUser, userController.actualizarUsuario)
 router.delete('/:id', userController.eliminarUsuario)
 
 router.post('/:userId/follow/:seguidoId' ,userController.seguirUsuario)
-router.delete('/:userId/follow/:seguidoId' ,userController.dejarDeSeguirUsuario)
-router.get('/:userId/follow' ,userController.obtenerSeguidosDeUnUsuario)
+router.delete('/:userId/unfollow/:seguidoId' ,userController.dejarDeSeguirUsuario)
+router.get('/:userId/following' ,userController.obtenerSeguidosDeUnUsuario)
 
 module.exports = router;

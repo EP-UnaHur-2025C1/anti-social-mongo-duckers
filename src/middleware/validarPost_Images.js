@@ -13,4 +13,6 @@ const validarPostImages = async (req, res, next) => {
   }
 };
 
-module.exports = validarPostImages;
+module.exports ={
+  validarPostImages
+}
