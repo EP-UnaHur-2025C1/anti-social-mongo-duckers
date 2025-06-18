@@ -47,6 +47,10 @@ const mostrarPublicacion = async (req, res) => {
   try {
     const postId = req.params.id;
     const publicacion = await Post.findById(postId).populate("images", "url -_id -postId");
+
+    if (!publicacion) {
+      return res.status(404).json({ message: "Publicación inexistente" });
+    }
   
     res.status(200).json(publicacion)
   } catch (error) {
@@ -153,10 +157,9 @@ const asociarTagAPost = async (req,res) =>{
     }
     
     if (!publicacion.tags.includes(tagId)) {
-      publicacion.tags.push(tagId);
-      etiqueta.posts.push(postId);
-      await publicacion.save();
-      await etiqueta.save();
+      await Post.findByIdAndUpdate(postId, { $push: { tags: tagId } });
+      await Tag.findByIdAndUpdate(tagId, { $push: { posts: postId } });
+      
       return res.status(200).json({message: `El Tag ${etiqueta.tag} asociado a la publicación`})
     } else {
       return res.status(200).json({message: `El Tag ${etiqueta.tag} ya se encontraba asociado a la publicación`})
@@ -182,11 +185,8 @@ const desasociarTagDePost = async (req, res) => {
     }
 
     if (publicacion.tags.includes(tagId)) {
-      publicacion.tags.pull(tagId);
-      etiqueta.posts.pull(postId);
-
-      await publicacion.save();
-      await etiqueta.save();
+      await Post.findByIdAndUpdate(postId, { $pull: { tags: tagId } });
+      await Tag.findByIdAndUpdate(tagId, { $pull: { posts: postId } });
 
       return res.status(200).json({ message: `El Tag ${etiqueta.tag} ha sido desasociado de la publicación` });
     } else {

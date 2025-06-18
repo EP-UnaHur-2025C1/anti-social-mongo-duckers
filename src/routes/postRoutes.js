@@ -1,8 +1,6 @@
 const { Router } = require('express')
 const router = Router()
 const validarPost = require('../middleware/validarPost')
-// const {validarActualizarImagen} = require('../middleware/validarPost_Images')
-//const validarTag = require('../middleware/validarTag')
 const postController = require('../controllers/postController')
 
 // Post
@@ -13,7 +11,7 @@ router.put('/:id', validarPost, postController.actualizarPublicacion)
 router.delete('/:id', postController.eliminarPublicacion)
 
 // // Images
-router.put('/:postId/images/:imageId', /*validarActualizarImagen, */ postController.actualizarImagen)
+router.put('/:postId/images/:imageId', postController.actualizarImagen)
 router.delete('/:postId/images/:imageId', postController.eliminarImagen)
 
 // // Tags

@@ -69,69 +69,90 @@ const eliminarUsuario = async (req, res) => {
   }
 };
 
-// const seguirUsuario = async (req,res) => {
-//     try {
-//         const userId = req.params.id
-//         const { seguidoId } = req.body
+const seguirUsuario = async (req, res) => {
+  try {
+    const { userId, seguidoId } = req.params
 
-//         const user = await User.findByPk(userId)
-//         const usuarioSeguido = await User.findByPk(seguidoId)
-        
-//         if(!user || !usuarioSeguido) {
-//             return res.status(404).json({ error: 'Usuario/s no encontrado/s' })
-//         }
-//         if(userId == seguidoId){
-//             return res.status(404).json({ error: 'No puedes seguirte a ti mismo' })
-//         }
-        
-//         const seguidos = await user.getSeguidos()
-//         const yaLoSigue = seguidos.some(unUser => unUser.id === seguidoId)
-//         if(yaLoSigue){
-//             return res.status(404).json({ error: 'Ya sigues a este usuario' })
-//         }
+    const user = await User.findById(userId)
+    const usuarioSeguido = await User.findById(seguidoId)
 
-//         await user.addSeguido(seguidoId)
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' })
+    }
+    if (!usuarioSeguido){
+      return res.status(404).json({ error: 'usuario a seguir no encontrado' })
+    }
+    if (userId == seguidoId) {
+      return res.status(404).json({ error: 'No puedes seguirte a ti mismo' })
+    }
 
-//         return res.status(201).json({ message: 'Has seguido correctamente a este usuario' })
-//     } catch (error) {
-//         console.error(error)
-//         return res.status(500).json({ error: 'Error al seguir al usuario' })
-//     }    
-// }
+    const yaLoSigue = user.seguidos.includes(seguidoId)
+    if (yaLoSigue) {
+      return res.status(404).json({ error: 'Ya sigues a este usuario' })
+    }
 
-// const dejarDeSeguirUsuario = async (req,res) => {
-//     try {
-//         const userId = req.params.id
-//         const { seguidoId } = req.body
+    await User.findByIdAndUpdate(userId, { $push: { seguidos: seguidoId } }, { new: true });
 
-//         const user = await User.findByPk(userId)
-//         const usuarioSeguido = await User.findByPk(seguidoId)
-        
-//         if(!user || !usuarioSeguido) {
-//             return res.status(404).json({ error: 'Usuario/s no encontrado/s' })
-//         }
-        
-//         const seguidos = await user.getSeguidos()
-//         const noLoSigues = !seguidos.some(unUser => unUser.id === seguidoId)
-//         if(noLoSigues){
-//             return res.status(404).json({ error: 'No sigues a este usuario' })
-//         }
+    return res.status(201).json({ message: `Has seguido correctamente a ${usuarioSeguido.nickName}` })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error al seguir al usuario' })
+  }
+}
 
-//         await user.removeSeguido(seguidoId)
+const dejarDeSeguirUsuario = async (req, res) => {
+  try {
+    const { userId, seguidoId } = req.params
 
-//         return res.status(200).json({ message: 'Has dejado de seguir a este usuario' })
-//     } catch (error) {
-//         console.error(error)
-//         return res.status(500).json({ error: 'Error al dejar de seguir a usuario' })
-//     }    
-// }
+    const user = await User.findById(userId)
+    const usuarioSeguido = await User.findById(seguidoId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' })
+    }
+    if (!usuarioSeguido){
+      return res.status(404).json({ error: 'No existe el usuario que intentas dejar de seguir' })
+    }
+
+    const noLoSigues = !user.seguidos.includes(seguidoId);
+    if (noLoSigues) {
+      return res.status(404).json({ error: 'No sigues a este usuario' })
+    }
+
+    await User.findByIdAndUpdate(userId, { $pull: { seguidos: seguidoId } }, { new: true });
+
+    return res.status(200).json({ message: `Has dejado de seguir a este usuario ${usuarioSeguido.nickName}` })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error al dejar de seguir a usuario' })
+  }
+}
+
+const obtenerSeguidosDeUnUsuario = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).populate('seguidos', 'nickName -_id');
+
+    if (!user) {
+      return res.status(404).json({ message: `Usuario no encontrado` });
+    }
+
+    return res.status(200).json({ message: `Este usuario sigue a: ${user.seguidos}` });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Error al obtener los seguidos del usuario' });
+  }
+};
+
 
 module.exports = {
     crearUsuario,
     mostrarUsuarios,
     mostrarUsuario,
     actualizarUsuario,
-    eliminarUsuario//,
-    // seguirUsuario,
-    // dejarDeSeguirUsuario
+    eliminarUsuario,
+    seguirUsuario,
+    dejarDeSeguirUsuario,
+    obtenerSeguidosDeUnUsuario
 }

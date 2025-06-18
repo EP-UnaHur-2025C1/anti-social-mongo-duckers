@@ -13,7 +13,11 @@ const userSchema = new mongoose.Schema({
     required: [true,"El email es obligatorio"],
     lowercase: [true,"El email debe estar en minúsculas"],
     match: [/^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/, 'Ingresa una dirección de correo electrónico válida.']
-  }
+  },
+  seguidos: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model("User", userSchema);

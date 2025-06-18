@@ -4,7 +4,7 @@ const validarTag = require('../middleware/validarTag')
 const router = Router()
 
 router.get('/', tagController.mostrarTags)
-router.get('/:id', validarTag, tagController.mostrarTag)
+router.get('/:id', tagController.mostrarTag)
 router.post('/', validarTag, tagController.crearTag)
 router.put('/:id', validarTag, tagController.actualizarTag)
 router.delete('/:id', tagController.eliminarTag)
