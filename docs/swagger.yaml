@@ -211,7 +211,7 @@ paths:
         '500':
           description: Error al dejar de seguir a usuario
 
-  /users/{id}/following:
+  /users/{id}/seguidoId:
     get:
       summary: Obtener los usuarios que un usuario sigue
       tags: [Users]
@@ -397,13 +397,13 @@ paths:
         '500':
           description: Error al eliminar publicación
 
-  /posts/{postId}/images/{imageId}:
+  /posts/{id}/images/{imageId}:
     put:
       summary: Actualizar imagen de una publicación por ID
       tags: [Posts]
       parameters:
         - in: path
-          name: postId
+          name: id
           description: ID de la publicación
           required: true
           schema:
@@ -446,7 +446,7 @@ paths:
       tags: [Posts]
       parameters:
         - in: path
-          name: postId
+          name: id
           description: ID de la publicación
           required: true
           schema:
@@ -469,13 +469,13 @@ paths:
         '500':
           description: Error al eliminar imagen
 
-  /posts/{postId}/tags/{tagId}:
+  /posts/{id}/tags/{tagId}:
     post:
       summary: Asociar tag a una publicación
       tags: [Posts]
       parameters:
         - in: path
-          name: postId
+          name: id
           description: ID de la publicación
           required: true
           schema:
@@ -503,7 +503,7 @@ paths:
       tags: [Posts]
       parameters:
         - in: path
-          name: postId
+          name: id
           description: ID de la publicación
           required: true
           schema:
