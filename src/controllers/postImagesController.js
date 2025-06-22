@@ -18,19 +18,15 @@ const crearImagen = async (url, postId) => {
 
 const crearImagenPost = async (req, res) => {
   try {
-    const postId = req.params.id;
+    const { url, postId } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(postId)) {
       return res.status(400).json({ message: "ID inválido" });
     }
-
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post inexistente" });
-    }
-
-    const nuevaImagen = new PostImages(req.body);
+    
+    const nuevaImagen = new PostImages({ url, post: postId });
     await nuevaImagen.save();
+
     return res.status(201).json(nuevaImagen);
   } catch (error) {
     return res.status(500).json({ message: "Error al crear imagen", error });
@@ -48,7 +44,8 @@ const mostrarImagenes = async (_, res) => {
 
 const actualizarImagenPost = async (req, res) => {
   try {
-    const imagenActualizada = await PostImages.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { url, postId } = req.body;
+    const imagenActualizada = await PostImages.findByIdAndUpdate(req.params.id,{url, postId}, { new: true });
     if (!imagenActualizada) {
       return res.status(404).json({ message: 'Imagen no encontrada' });
     }
@@ -61,10 +58,7 @@ const actualizarImagenPost = async (req, res) => {
 const eliminarImagenPost = async (req, res) => {
   try {
     const imagenId = req.params.id;
-    const imagenAEliminar = await PostImages.findByIdAndDelete(imagenId);
-    if (!imagenAEliminar) {
-      return res.status(404).json({ message: `No existe la imagen con ID: ${imagenId}` });
-    }
+    await PostImages.findByIdAndDelete(imagenId);
 
     return res.status(200).json({message: "Imagen eliminada exitosamente"});
   } catch (error) {

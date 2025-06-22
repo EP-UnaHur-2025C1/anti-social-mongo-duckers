@@ -1,20 +1,12 @@
 const Post = require('../models/post');
 const PostImages = require('../models/postImages')
 const Tag = require('../models/tag');
-const User = require('../models/user');
 const Comment = require('../models/comment');
-const mongoose = require('mongoose');
 const { crearImagen } = require('./postImagesController')
 
 const crearPublicacion = async (req, res) => {
   try {
     const { userId, content, imagenes } = req.body;
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "Usuario inexistente" });
-    }
-
     const nuevoPost = new Post({userId,content});
     await nuevoPost.save();
     
@@ -45,12 +37,8 @@ const mostrarPublicaciones = async (_,res) => {
 
 const mostrarPublicacion = async (req, res) => {
   try {
-    const postId = req.params.id;
+    const postId = req.params.id
     const publicacion = await Post.findById(postId).populate("images", "url -postId");
-
-    if (!publicacion) {
-      return res.status(404).json({ message: "Publicación inexistente" });
-    }
   
     res.status(200).json(publicacion)
   } catch (error) {
@@ -62,16 +50,14 @@ const actualizarPublicacion = async (req,res) =>{
   try {
     const { imagenes } = req.body;
     const postActualizado = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!postActualizado) {
-      return res.status(404).json({ message: 'Publicación no encontrada' });
-    }
 
     if(imagenes){
+      await PostImages.deleteMany({ postId: postActualizado._id });
       for(const imagen of imagenes){
         await crearImagen(imagen.url, postActualizado._id)
       }
     }
-
+    
     const postConImagenes = await Post.findById(postActualizado._id).populate('images', 'url -_id -postId')
 
     return res.status(200).json({ message: 'Publicación actualizada', post: postConImagenes });
@@ -83,11 +69,7 @@ const actualizarPublicacion = async (req,res) =>{
 const eliminarPublicacion = async (req, res) => {
   try {
     const postId = req.params.id;
-
     const publicacionAEliminar = await Post.findById(postId);
-    if (!publicacionAEliminar) {
-      return res.status(404).json({ message: `No existe la Publicación con ID: ${postId}` });
-    }
 
     await PostImages.deleteMany({ postId: publicacionAEliminar._id });
     await Comment.deleteMany({ postId: publicacionAEliminar._id });
@@ -101,18 +83,8 @@ const eliminarPublicacion = async (req, res) => {
 
 const eliminarImagen = async (req,res)=>{
     try {
-        const {postId, imageId} = req.params
-        const publicacion = await Post.findById(postId)
-
-        if(!publicacion){
-            return res.status(404).json({message: "Publicacion no encontrada"})
-        }
-
-        const imagen = await PostImages.findOneAndDelete({_id: imageId, postId: postId})
-
-        if(!imagen){
-            return res.status(404).json({message: "Imagen no encontrada"})
-        }
+        const {id, imageId} = req.params
+        await PostImages.findOneAndDelete({_id: imageId, postId: id})
 
         res.status(200).json({message: "Imagen eliminada"})
     } catch (error) {
@@ -123,18 +95,8 @@ const eliminarImagen = async (req,res)=>{
 
 const actualizarImagen = async (req,res)=>{
     try {
-        const { postId, imageId } = req.params
-        const publicacion = await Post.findById(postId)
-        
-        if(!publicacion){
-            return res.status(404).json({message: `Publicacion no encontrada`})
-        }
-        
-        const imagen = await PostImages.findOneAndUpdate({_id: imageId, postId: postId}, req.body, { new: true })
-        
-        if(!imagen){
-            return res.status(404).json({message: "Imagen no encontrada"})
-        }
+        const { id, imageId } = req.params
+        const imagen = await PostImages.findOneAndUpdate({_id: imageId, postId: id}, req.body, { new: true })
 
         res.status(200).json(imagen)
     } catch (error) {
@@ -145,20 +107,17 @@ const actualizarImagen = async (req,res)=>{
 
 const asociarTagAPost = async (req,res) =>{
   try {
-    const { postId, tagId } = req.params
-    const publicacion = await Post.findById(postId);
+    const { id, tagId } = req.params
+    const publicacion = await Post.findById(id);
     const etiqueta = await Tag.findById(tagId);
 
-    if(!publicacion){
-      return res.status(404).json({message: `Publicacion no encontrada`})
-    }
     if(!etiqueta){
       return res.status(404).json({message: `Tag no encontrado`})
     }
     
     if (!publicacion.tags.includes(tagId)) {
-      await Post.findByIdAndUpdate(postId, { $push: { tags: tagId } });
-      await Tag.findByIdAndUpdate(tagId, { $push: { posts: postId } });
+      await Post.findByIdAndUpdate(id, { $push: { tags: tagId } });
+      await Tag.findByIdAndUpdate(tagId, { $push: { posts: id } });
       
       return res.status(200).json({message: `El Tag ${etiqueta.tag} asociado a la publicación`})
     } else {
@@ -172,21 +131,18 @@ const asociarTagAPost = async (req,res) =>{
 
 const desasociarTagDePost = async (req, res) => {
   try {
-    const { postId, tagId } = req.params;
+    const { id, tagId } = req.params;
 
-    const publicacion = await Post.findById(postId);
+    const publicacion = await Post.findById(id);
     const etiqueta = await Tag.findById(tagId);
 
-    if (!publicacion) {
-      return res.status(404).json({ message: `Publicación no encontrada` });
-    }
     if (!etiqueta) {
       return res.status(404).json({ message: `Tag no encontrado` });
     }
 
     if (publicacion.tags.includes(tagId)) {
-      await Post.findByIdAndUpdate(postId, { $pull: { tags: tagId } });
-      await Tag.findByIdAndUpdate(tagId, { $pull: { posts: postId } });
+      await Post.findByIdAndUpdate(id, { $pull: { tags: tagId } });
+      await Tag.findByIdAndUpdate(tagId, { $pull: { posts: id } });
 
       return res.status(200).json({ message: `El Tag ${etiqueta.tag} ha sido desasociado de la publicación` });
     } else {
@@ -200,12 +156,8 @@ const desasociarTagDePost = async (req, res) => {
 
 const obtenerTagsDeUnPost = async (req, res) => {
   try {
-    const { postId } = req.params;
-    const publicacion = await Post.findById(postId).populate('tags');
-
-    if (!publicacion) {
-      return res.status(404).json({ message: `Publicación no encontrada` });
-    }
+    const { id } = req.params;
+    const publicacion = await Post.findById(id).populate('tags');
 
     return res.status(200).json(publicacion.tags);
   } catch (error) {

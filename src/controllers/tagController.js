@@ -27,9 +27,6 @@ const mostrarTag = async (req, res) => {
       return res.status(400).json({ message: "ID inválido" });
     }
     const tag = await Tag.findById(id);
-    if (!tag) {
-      return res.status(404).json({ message: "Tag no encontrado" });
-    }
     return res.status(200).json(tag);
   } catch (error) {
     return res.status(500).json({ message: "Error al mostrar tag", error });
@@ -39,9 +36,7 @@ const mostrarTag = async (req, res) => {
 const actualizarTag = async (req,res) =>{
   try {
     const tagActualizado = await Tag.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!tagActualizado) {
-      return res.status(404).json({ message: 'Tag no encontrado' });
-    }
+    
     return res.status(200).json({ message: 'Tag actualizado', tag: tagActualizado });
   } catch (error) {
     return res.status(500).json({ message: 'Error al actualizar el tag', error });
@@ -51,10 +46,7 @@ const actualizarTag = async (req,res) =>{
 const eliminarTag = async (req, res) => {
   try {
     const tagId = req.params.id;
-    const tagAEliminar = await Tag.findByIdAndDelete(tagId);
-    if (!tagAEliminar) {
-      return res.status(404).json({ message: `No existe el tag con ID: ${tagId}` });
-    }
+    await Tag.findByIdAndDelete(tagId);
 
     return res.status(200).json({message: "Tag eliminado exitosamente"});
   } catch (error) {

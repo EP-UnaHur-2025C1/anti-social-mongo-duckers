@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 
 const crearComentario = async (req, res) => {
   try {
-    const nuevoComentario = new Comment(req.body);
+    const {comment, postId, userId} = req.body
+    const nuevoComentario = new Comment({comment, postId, userId});
     await nuevoComentario.save();
     return res.status(201).json(nuevoComentario);
   } catch (error) {
@@ -27,9 +28,7 @@ const mostrarComentario = async (req, res) => {
       return res.status(400).json({ message: "ID inválido" });
     }
     const comentario = await Comment.findById(id);
-    if (!comentario) {
-      return res.status(404).json({ message: "Comentario no encontrado" });
-    }
+ 
     return res.status(200).json(comentario);
   } catch (error) {
     return res.status(500).json({ message: "Error al mostrar comentario", error });
@@ -38,10 +37,9 @@ const mostrarComentario = async (req, res) => {
 
 const actualizarComentario = async (req,res) =>{
   try {
-    const comentarioActualizado = await Comment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!comentarioActualizado) {
-      return res.status(404).json({ message: 'Comentario no encontrado' });
-    }
+    const { comment, postId, userId } = req.body
+    const comentarioActualizado = await Comment.findByIdAndUpdate(req.params.id,{comment, postId, userId}, { new: true });
+
     return res.status(200).json({ message: 'Comentario actualizado', comment: comentarioActualizado });
   } catch (error) {
     return res.status(500).json({ message: 'Error al actualizar el comentario', error });
@@ -51,11 +49,7 @@ const actualizarComentario = async (req,res) =>{
 const eliminarComentario = async (req, res) => {
   try {
     const commentId = req.params.id;
-
-    const comentarioAEliminar = await Comment.findByIdAndDelete(commentId);
-    if (!comentarioAEliminar) {
-      return res.status(404).json({ message: `No existe el comentario con ID: ${commentId}` });
-    }
+    await Comment.findByIdAndDelete(commentId);
 
     return res.status(200).json({message: "Comentario eliminado exitosamente"});
   } catch (error) {

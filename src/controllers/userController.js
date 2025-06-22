@@ -30,9 +30,7 @@ const mostrarUsuario = async (req, res) => {
       return res.status(400).json({ message: "ID inválido" });
     }
     const usuario = await User.findById(id);
-    if (!usuario) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
+
     return res.status(200).json(usuario);
   } catch (error) {
     return res.status(500).json({ message: "Error al mostrar usuario", error });
@@ -42,9 +40,7 @@ const mostrarUsuario = async (req, res) => {
 const actualizarUsuario = async (req,res) =>{
   try {
     const usuarioActualizado = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!usuarioActualizado) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
+
     return res.status(200).json({ message: 'Usuario actualizado', user: usuarioActualizado });
   } catch (error) {
     return res.status(500).json({ message: 'Error al actualizar el usuario', error });
@@ -53,12 +49,8 @@ const actualizarUsuario = async (req,res) =>{
 
 const eliminarUsuario = async (req, res) => {
   try {
-    const id = req.params.id;
-
+    const id = req.params.id
     const usuarioAEliminar = await User.findById(id);
-    if (!usuarioAEliminar) {
-      return res.status(404).json({ message: `No existe el usuario con ID: ${id}` });
-    }
 
     await Post.deleteMany({ userId: usuarioAEliminar._id });
     await Comment.deleteMany({ userId: usuarioAEliminar._id });
@@ -72,18 +64,11 @@ const eliminarUsuario = async (req, res) => {
 
 const seguirUsuario = async (req, res) => {
   try {
-    const { userId, seguidoId } = req.params
-
-    const user = await User.findById(userId)
+    const { id, seguidoId } = req.params
+    const user = await User.findById(id)
     const usuarioSeguido = await User.findById(seguidoId)
 
-    if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' })
-    }
-    if (!usuarioSeguido){
-      return res.status(404).json({ error: 'usuario a seguir no encontrado' })
-    }
-    if (userId == seguidoId) {
+    if (id == seguidoId) {
       return res.status(404).json({ error: 'No puedes seguirte a ti mismo' })
     }
 
@@ -92,7 +77,7 @@ const seguirUsuario = async (req, res) => {
       return res.status(404).json({ error: 'Ya sigues a este usuario' })
     }
 
-    await User.findByIdAndUpdate(userId, { $push: { seguidos: seguidoId } }, { new: true });
+    await User.findByIdAndUpdate(id, { $push: { seguidos: seguidoId } }, { new: true });
 
     return res.status(201).json({ message: `Has seguido correctamente a ${usuarioSeguido.nickName}` })
   } catch (error) {
@@ -103,24 +88,17 @@ const seguirUsuario = async (req, res) => {
 
 const dejarDeSeguirUsuario = async (req, res) => {
   try {
-    const { userId, seguidoId } = req.params
+    const { id, seguidoId } = req.params
 
-    const user = await User.findById(userId)
+    const user = await User.findById(id)
     const usuarioSeguido = await User.findById(seguidoId)
-
-    if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' })
-    }
-    if (!usuarioSeguido){
-      return res.status(404).json({ error: 'No existe el usuario que intentas dejar de seguir' })
-    }
 
     const noLoSigues = !user.seguidos.includes(seguidoId);
     if (noLoSigues) {
       return res.status(404).json({ error: 'No sigues a este usuario' })
     }
 
-    await User.findByIdAndUpdate(userId, { $pull: { seguidos: seguidoId } }, { new: true });
+    await User.findByIdAndUpdate(id, { $pull: { seguidos: seguidoId } }, { new: true });
 
     return res.status(200).json({ message: `Has dejado de seguir a este usuario ${usuarioSeguido.nickName}` })
   } catch (error) {
@@ -131,13 +109,8 @@ const dejarDeSeguirUsuario = async (req, res) => {
 
 const obtenerSeguidosDeUnUsuario = async (req, res) => {
   try {
-    const { userId } = req.params;
-
-    const user = await User.findById(userId).populate('seguidos', 'nickName -_id');
-
-    if (!user) {
-      return res.status(404).json({ message: `Usuario no encontrado` });
-    }
+    const { id } = req.params;
+    const user = await User.findById(id).populate('seguidos', 'nickName -_id');
 
     return res.status(200).json({ message: `Este usuario sigue a: ${user.seguidos}` });
   } catch (error) {
