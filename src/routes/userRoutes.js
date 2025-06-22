@@ -1,16 +1,17 @@
 const { Router } = require('express');
 const userController = require('../controllers/userController')
 const validarUser = require('../middleware/validarUser')
+const {existeUsuario, existeSeguidoId} = require('../middleware/validarExistencia')
 const router = Router()
 
 router.get('/', userController.mostrarUsuarios)
-router.get('/:id', userController.mostrarUsuario)
+router.get('/:id', existeUsuario, userController.mostrarUsuario)
 router.post('/', validarUser, userController.crearUsuario)
-router.put('/:id', validarUser, userController.actualizarUsuario)
-router.delete('/:id', userController.eliminarUsuario)
+router.put('/:id', validarUser, existeUsuario, userController.actualizarUsuario)
+router.delete('/:id', existeUsuario, userController.eliminarUsuario)
 
-router.post('/:userId/follow/:seguidoId' ,userController.seguirUsuario)
-router.delete('/:userId/unfollow/:seguidoId' ,userController.dejarDeSeguirUsuario)
-router.get('/:userId/following' ,userController.obtenerSeguidosDeUnUsuario)
+router.post('/:id/follow/:seguidoId', existeUsuario, existeSeguidoId, userController.seguirUsuario)
+router.delete('/:id/unfollow/:seguidoId', existeUsuario, existeSeguidoId, userController.dejarDeSeguirUsuario)
+router.get('/:id/seguidoId', existeUsuario, userController.obtenerSeguidosDeUnUsuario)
 
 module.exports = router;

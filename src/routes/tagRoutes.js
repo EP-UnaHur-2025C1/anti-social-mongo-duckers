@@ -1,12 +1,13 @@
 const { Router } = require('express');
 const tagController = require('../controllers/tagController')
 const validarTag = require('../middleware/validarTag')
+const {existeTag} = require('../middleware/validarExistencia')
 const router = Router()
 
 router.get('/', tagController.mostrarTags)
-router.get('/:id', tagController.mostrarTag)
+router.get('/:id', existeTag, tagController.mostrarTag)
 router.post('/', validarTag, tagController.crearTag)
-router.put('/:id', validarTag, tagController.actualizarTag)
-router.delete('/:id', tagController.eliminarTag)
+router.put('/:id', validarTag, existeTag, tagController.actualizarTag)
+router.delete('/:id', existeTag, tagController.eliminarTag)
 
 module.exports = router;

@@ -2,21 +2,22 @@ const { Router } = require('express')
 const router = Router()
 const validarPost = require('../middleware/validarPost')
 const postController = require('../controllers/postController')
+const {existePublicacion, existeImagenPost, existeTagPost, existeUserBody} = require('../middleware/validarExistencia')
 
 // Post
 router.get('/', postController.mostrarPublicaciones)
-router.get('/:id', postController.mostrarPublicacion)
-router.post('/', validarPost, postController.crearPublicacion)
-router.put('/:id', validarPost, postController.actualizarPublicacion)
-router.delete('/:id', postController.eliminarPublicacion)
+router.get('/:id', existePublicacion, postController.mostrarPublicacion)
+router.post('/', validarPost, existeUserBody, postController.crearPublicacion)
+router.put('/:id', validarPost, existePublicacion, existeUserBody, postController.actualizarPublicacion)
+router.delete('/:id', existePublicacion, postController.eliminarPublicacion)
 
 // // Images
-router.put('/:postId/images/:imageId', postController.actualizarImagen)
-router.delete('/:postId/images/:imageId', postController.eliminarImagen)
+router.put('/:id/images/:imageId', existePublicacion, existeImagenPost, postController.actualizarImagen)
+router.delete('/:id/images/:imageId', existePublicacion, existeImagenPost, postController.eliminarImagen)
 
 // // Tags
-router.post('/:postId/tags/:tagId', postController.asociarTagAPost);
-router.delete('/:postId/tags/:tagId', postController.desasociarTagDePost);
-router.get('/:postId/tags', postController.obtenerTagsDeUnPost)
+router.post('/:id/tags/:tagId', existePublicacion, existeTagPost, postController.asociarTagAPost);
+router.delete('/:id/tags/:tagId', existePublicacion, existeTagPost, postController.desasociarTagDePost);
+router.get('/:id/tags', existePublicacion, postController.obtenerTagsDeUnPost)
 
 module.exports = router
