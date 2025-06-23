@@ -3,6 +3,7 @@ const PostImages = require('../models/postImages')
 const Tag = require('../models/tag');
 const Comment = require('../models/comment');
 const { crearImagen } = require('./postImagesController')
+const redisClient = require('../config/redisClient')
 
 const crearPublicacion = async (req, res) => {
   try {
@@ -18,6 +19,8 @@ const crearPublicacion = async (req, res) => {
 
     const postConImagenes = await Post.findById(nuevoPost._id).populate('images', 'url -_id -postId')
 
+    await redisClient.del('publicaciones:todas')
+
     return res.status(201).json(postConImagenes);
   } catch (error) {
     console.error(error);
@@ -26,8 +29,16 @@ const crearPublicacion = async (req, res) => {
 };
 
 const mostrarPublicaciones = async (_,res) => {
+  const cacheKey = 'publicaciones:todas'
   try {
+    const cached = await redisClient.get(cacheKey)
+    if(cached){
+      return res.status(200).json(JSON.parse(cached))
+    }
+
     const publicaciones = await Post.find().populate("images", "url -postId");
+
+    await redisClient.set(cacheKey, JSON.stringify(publicaciones), { EX: 300 })
 
     return res.status(200).json(publicaciones);
   } catch (error) {
@@ -38,7 +49,16 @@ const mostrarPublicaciones = async (_,res) => {
 const mostrarPublicacion = async (req, res) => {
   try {
     const postId = req.params.id
+
+    const cacheKey = `publicacion:${id}`
+    const cached = await redisClient.get(cacheKey)
+    if(cached){
+      return res.status(200).json(JSON.parse(cached))
+    }
+
     const publicacion = await Post.findById(postId).populate("images", "url -postId");
+
+    await redisClient.set(cacheKey, JSON.stringify(publicacion), { EX: 300 })
   
     res.status(200).json(publicacion)
   } catch (error) {
@@ -60,6 +80,8 @@ const actualizarPublicacion = async (req,res) =>{
     
     const postConImagenes = await Post.findById(postActualizado._id).populate('images', 'url -_id -postId')
 
+    await redisClient.del('publicaciones:todas')
+
     return res.status(200).json({ message: 'Publicación actualizada', post: postConImagenes });
   } catch (error) {
     return res.status(500).json({ message: 'Error al actualizar la publicación', error });
@@ -75,6 +97,9 @@ const eliminarPublicacion = async (req, res) => {
     await Comment.deleteMany({ postId: publicacionAEliminar._id });
     await publicacionAEliminar.deleteOne();
 
+    await redisClient.del(`publicacion:${id}`)
+    await redisClient.del('publicaciones:todas')
+
     return res.status(200).json({message: "Publicación eliminada exitosamente"});
   } catch (error) {
     return res.status(500).json({ message:"Error al eliminar Publicación", error});
@@ -86,6 +111,9 @@ const eliminarImagen = async (req,res)=>{
         const {id, imageId} = req.params
         await PostImages.findOneAndDelete({_id: imageId, postId: id})
 
+        await redisClient.del(`publicacion:${id}`); 
+        await redisClient.del('publicaciones:todas'); 
+
         res.status(200).json({message: "Imagen eliminada"})
     } catch (error) {
         console.error(error)
@@ -95,10 +123,13 @@ const eliminarImagen = async (req,res)=>{
 
 const actualizarImagen = async (req,res)=>{
     try {
-        const { id, imageId } = req.params
-        const imagen = await PostImages.findOneAndUpdate({_id: imageId, postId: id}, req.body, { new: true })
+      const { id, imageId } = req.params
+      const imagen = await PostImages.findOneAndUpdate({_id: imageId, postId: id}, req.body, { new: true })
 
-        res.status(200).json(imagen)
+      await redisClient.del(`publicacion:${req.params.id}`)
+      await redisClient.del('publicaciones:todas')
+
+      res.status(200).json(imagen)
     } catch (error) {
         console.error(error)
         return res.status(500).json({ error: 'Error al actualizar imagen' })
@@ -157,7 +188,18 @@ const desasociarTagDePost = async (req, res) => {
 const obtenerTagsDeUnPost = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const cacheKey = `publicacion:${id}:tags`; 
+
+    const cachedTags = await redisClient.get(cacheKey);
+    if (cachedTags) {
+      return res.status(200).json(JSON.parse(cachedTags));
+    }
+
     const publicacion = await Post.findById(id).populate('tags');
+
+    const tags = publicacion.tags || [];
+    await redisClient.set(cacheKey, JSON.stringify(tags), { EX: 300 });
 
     return res.status(200).json(publicacion.tags);
   } catch (error) {

@@ -2,12 +2,14 @@ const User = require('../models/user');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const mongoose = require('mongoose');
+const redisClient = require('../config/redisClient')
 
 const crearUsuario = async (req, res) => {
   try {
     const nuevoUsuario = new User(req.body);
     await nuevoUsuario.save();
-    
+
+    await redisClient.del('usuarios:todos')
     return res.status(201).json(nuevoUsuario);
   } catch (error) {
     return res.status(500).json({ message: "Error al crear usuario", error });
@@ -15,8 +17,17 @@ const crearUsuario = async (req, res) => {
 };
 
 const mostrarUsuarios = async (_, res) => {
+  const cacheKey = 'usuarios:todos'
   try {
+    const cached = await redisClient.get(cacheKey)
+    if(cached){
+      return res.status(200).json(JSON.parse(cached))
+    }
+
     const usuarios = await User.find().select("nickName email");
+
+    await redisClient.set(cacheKey, JSON.stringify(usuarios), { EX: 300 })
+
     return res.status(200).json(usuarios);
   } catch (error) {
     return res.status(500).json({ message: "Error al mostrar usuarios", error });
@@ -29,7 +40,16 @@ const mostrarUsuario = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "ID inválido" });
     }
+
+    const cacheKey = `usuario:${id}`
+    const cached = await redisClient.get(cacheKey)
+    if(cached){
+      return res.status(200).json(JSON.parse(cached))
+    }
+
     const usuario = await User.findById(id);
+
+    await redisClient.set(cacheKey, JSON.stringify(usuario), { EX: 300 })
 
     return res.status(200).json(usuario);
   } catch (error) {
@@ -40,6 +60,9 @@ const mostrarUsuario = async (req, res) => {
 const actualizarUsuario = async (req,res) =>{
   try {
     const usuarioActualizado = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    await redisClient.del(`usuario:${req.params.id}`)
+    await redisClient.del('usuarios:todos')
 
     return res.status(200).json({ message: 'Usuario actualizado', user: usuarioActualizado });
   } catch (error) {
@@ -55,6 +78,9 @@ const eliminarUsuario = async (req, res) => {
     await Post.deleteMany({ userId: usuarioAEliminar._id });
     await Comment.deleteMany({ userId: usuarioAEliminar._id });
     await usuarioAEliminar.deleteOne();
+
+    await redisClient.del(`usuario:${id}`)
+    await redisClient.del('usuarios:todos')
 
     return res.status(200).json({message: "Usuario eliminado exitosamente"});
   } catch (error) {

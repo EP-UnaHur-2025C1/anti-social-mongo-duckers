@@ -1,11 +1,12 @@
 const express = require('express')
-const app = express()
 const conectarDB = require('./config/db')
+const redisClient = require('./config/redisClient')
 const swaggerUi = require('swagger-ui-express')
 const YAML = require('yamljs')
-
 const swaggerDocument = YAML.load('./docs/swagger.yaml')
 
+
+const app = express()
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
@@ -20,6 +21,11 @@ app.use('/tags', require('./routes/tagRoutes'));
 
 // Conexión a MongoDB
 conectarDB()
+
+//Conexión a Redis
+redisClient.connect()
+    .then(() => console.log('Conectado a Redis'))
+    .catch(console.error)
 
 app.listen(PORT, ()=>{
     console.log(`Aplicación corriendo en el puerto: ${PORT}`)

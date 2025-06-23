@@ -21,7 +21,7 @@ const validarExistenciaId = (modelo, data = 'id', cuerpo, nombre) => async (req,
 const existePublicacion = validarExistenciaId(Post, 'id', 'params', 'Publicación')
 const existeUserBody = validarExistenciaId(User, 'userId', 'body', 'Usuario')
 const existeImagenPost= validarExistenciaId(PostImages, 'imageId', 'params', 'Imagen')
-const existeTagPost = validarExistenciaId(Tag, 'tagId', 'Tag')
+const existeTagPost = validarExistenciaId(Tag, 'tagId', 'params', 'Tag')
 
 // Validaciones Imagenes
 const existeImagen= validarExistenciaId(PostImages, 'id', 'params', 'Imagen')
