@@ -1,5 +1,6 @@
 const Comment = require('../models/comment');
 const mongoose = require('mongoose');
+require('dotenv').config()
 
 const crearComentario = async (req, res) => {
   try {
@@ -14,7 +15,13 @@ const crearComentario = async (req, res) => {
 
 const mostrarComentarios = async (_, res) => {
   try {
-    const comentarios = await Comment.find().select("comment");
+    const fechaLimite = new Date();
+    fechaLimite.setMonth(fechaLimite.getMonth() - process.env.ANTIGUEDAD_COMENTARIO); 
+
+    const comentarios = await Comment.find({ 
+      createdAt: { $gte: fechaLimite }
+    }).select("comment");
+
     return res.status(200).json(comentarios);
   } catch (error) {
     return res.status(500).json({ message: "Error al mostrar comentarios", error });
