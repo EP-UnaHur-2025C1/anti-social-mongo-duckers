@@ -1,0 +1,194 @@
+{
+	"info": {
+		"_postman_id": "5cdef2c8-a27b-4a51-a81a-06294a8ae9d7",
+		"name": "user",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44932652"
+	},
+	"item": [
+		{
+			"name": "POST users",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nickName\": \"UsuarioPrueba\",\r\n    \"email\": \"test@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT users",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nickName\": \"Usuario-Cambiado\",\r\n    \"email\": \"test2@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/users/68587fc7ee3346432f90496c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"68587fc7ee3346432f90496c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DEL users",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users/68587fc7ee3346432f90496c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"68587fc7ee3346432f90496c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET users",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET user by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users/6851d5b8afacb61eb2e83dba/seguidoid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"6851d5b8afacb61eb2e83dba",
+						"seguidoid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST users followers",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users/6851d5b8afacb61eb2e83dba/follow/6851d5d7afacb61eb2e83dc3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"6851d5b8afacb61eb2e83dba",
+						"follow",
+						"6851d5d7afacb61eb2e83dc3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST users followers",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users/6851d5b8afacb61eb2e83dba/unfollow/6851d5d7afacb61eb2e83dc3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"6851d5b8afacb61eb2e83dba",
+						"unfollow",
+						"6851d5d7afacb61eb2e83dc3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET users followers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	]
+}

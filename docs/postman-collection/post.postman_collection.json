@@ -1,0 +1,262 @@
+{
+	"info": {
+		"_postman_id": "17f3e19f-c0b4-44ce-89c3-d00622715def",
+		"name": "post",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44932652"
+	},
+	"item": [
+		{
+			"name": "POST posts",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"6851d5b8afacb61eb2e83dba\",\r\n    \"content\": \"post de prueba\",\r\n    \"imagenes\": [\r\n        {\"url\":\"https://picsum.photos/id/22/200/300\"}\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT posts",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"6851d5b8afacb61eb2e83dba\",\r\n    \"content\": \"post cambiado\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/685887dcee3346432f904994",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"685887dcee3346432f904994"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DEL posts",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/posts/685887dcee3346432f904994",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"685887dcee3346432f904994"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET post by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/posts/685887dcee3346432f904994",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"685887dcee3346432f904994"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT posts images",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"imagenes\": [\r\n        {\"url\": \"https://picsum.photos/id/1/200/300\"}\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/68588ddcee3346432f9049ec/images/68588ddcee3346432f9049ef",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"68588ddcee3346432f9049ec",
+						"images",
+						"68588ddcee3346432f9049ef"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DEL posts images",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/posts/1/images/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"1",
+						"images",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST posts tags",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tagId\": \"68520c4ee6d13b1cf696b493\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/68520faf9617d191f241a2c1/tags",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"68520faf9617d191f241a2c1",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DEL posts tags",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tagId\": \"68520c4ee6d13b1cf696b493\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/68520faf9617d191f241a2c1/tags/68520c4ee6d13b1cf696b493",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"68520faf9617d191f241a2c1",
+						"tags",
+						"68520c4ee6d13b1cf696b493"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET posts tags",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/posts/685212041536daebe64dfcd2/tags/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"685212041536daebe64dfcd2",
+						"tags",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
