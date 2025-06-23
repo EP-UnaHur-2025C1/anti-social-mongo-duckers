@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const tagController = require('../controllers/tagController')
-const validarTag = require('../middleware/validarTag')
+const {validarTag} = require('../middleware/validarSchema')
 const {existeTag} = require('../middleware/validarExistencia')
 const router = Router()
 

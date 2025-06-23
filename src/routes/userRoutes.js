@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const userController = require('../controllers/userController')
-const validarUser = require('../middleware/validarUser')
+const {validarUser} = require('../middleware/validarSchema')
 const {existeUsuario, existeSeguidoId} = require('../middleware/validarExistencia')
 const router = Router()
 

@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const postImagesController = require('../controllers/postImagesController');
-const {validarPostImages} = require('../middleware/validarPost_Images');
+const {validarPostImages} = require('../middleware/validarSchema');
 const {existeImagen, existePostBody} = require('../middleware/validarExistencia')
 
 const router = Router();

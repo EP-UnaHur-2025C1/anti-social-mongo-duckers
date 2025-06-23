@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const commentController = require('../controllers/commentController');
-const validarComment = require('../middleware/validarComment');
+const {validarComment} = require('../middleware/validarSchema');
 const {existeComentario, existePostBody, existeUserBody} = require('../middleware/validarExistencia')
 const router = Router();
 

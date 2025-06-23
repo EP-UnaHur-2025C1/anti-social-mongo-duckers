@@ -1,8 +1,8 @@
 const { Router } = require('express')
 const router = Router()
-const validarPost = require('../middleware/validarPost')
-const postController = require('../controllers/postController')
+const {validarPost} = require('../middleware/validarSchema')
 const {existePublicacion, existeImagenPost, existeTagPost, existeUserBody} = require('../middleware/validarExistencia')
+const postController = require('../controllers/postController')
 
 // Post
 router.get('/', postController.mostrarPublicaciones)
