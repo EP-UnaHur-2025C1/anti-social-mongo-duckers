@@ -48,7 +48,7 @@ const mostrarPublicaciones = async (_,res) => {
 
 const mostrarPublicacion = async (req, res) => {
   try {
-    const postId = req.params.id
+    const id = req.params.id
 
     const cacheKey = `publicacion:${id}`
     const cached = await redisClient.get(cacheKey)
@@ -56,7 +56,7 @@ const mostrarPublicacion = async (req, res) => {
       return res.status(200).json(JSON.parse(cached))
     }
 
-    const publicacion = await Post.findById(postId).populate("images", "url -postId");
+    const publicacion = await Post.findById(id).populate("images", "url -postId");
 
     await redisClient.set(cacheKey, JSON.stringify(publicacion), { EX: 300 })
   
